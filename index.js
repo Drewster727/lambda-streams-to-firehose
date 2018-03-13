@@ -462,10 +462,14 @@ function processEvent(event, serviceName, streamName, callback) {
                 }
             });
         } else {
-            // dynamo update stream record
-            var data = exports.createDynamoDataItem(record);
+            if (record.eventName == "REMOVE" && record.userIdentity && record.userIdentity.principalId == "dynamodb.amazonaws.com") {
+                console.log(record.eventName);
+         
+                // dynamo update stream record
+                var data = exports.createDynamoDataItem(record);
 
-            recordCallback(null, data);
+                recordCallback(null, data);
+            }
         }
     }, function (err, extractedUserRecords) {
         if (err) {
