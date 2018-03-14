@@ -154,24 +154,28 @@ exports.init = init;
  * used for transforming kinesis records
  */
 function createDynamoDataItem(record) {
-    var output = {};
-    output.Keys = record.dynamodb.Keys;
+  var output = {};
+  
+  if (record.dynamodb.OldImage)
+    output = record.dynamodb.OldImage;
+  
+  // output.Keys = record.dynamodb.Keys;
 
-    if (record.dynamodb.NewImage)
-        output.NewImage = record.dynamodb.NewImage;
-    if (record.dynamodb.OldImage)
-        output.OldImage = record.dynamodb.OldImage;
+  // if (record.dynamodb.NewImage)
+  //   output.NewImage = record.dynamodb.NewImage;
+  // if (record.dynamodb.OldImage)
+  //   output.OldImage = record.dynamodb.OldImage;
 
-    // add the sequence number and other metadata
-    output.SequenceNumber = record.dynamodb.SequenceNumber;
-    output.SizeBytes = record.dynamodb.SizeBytes;
-    output.ApproximateCreationDateTime = record.dynamodb.ApproximateCreationDateTime;
-    output.eventName = record.eventName;
-    // adding userIdentity, used by DynamoDB TTL to indicate removal by TTL as
-    // opposed to user initiated remove
-    output.userIdentity = record.userIdentity;
+  // add the sequence number and other metadata
+  //output.SequenceNumber = record.dynamodb.SequenceNumber;
+  //output.SizeBytes = record.dynamodb.SizeBytes;
+  //output.ApproximateCreationDateTime = record.dynamodb.ApproximateCreationDateTime;
+  //output.eventName = record.eventName;
+  // adding userIdentity, used by DynamoDB TTL to indicate removal by TTL as
+  // opposed to user initiated remove
+  //output.userIdentity = record.userIdentity;
 
-    return output;
+  return output;
 }
 
 exports.createDynamoDataItem = createDynamoDataItem;
