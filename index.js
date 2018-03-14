@@ -452,7 +452,7 @@ function processEvent(event, serviceName, streamName, callback) {
         console.log("Forwarding " + event.Records.length + " " + serviceName + " records to Delivery Stream " + deliveryStreamName);
     }
 
-    async.map(event.Records, function (record, recordCallback) {
+    async.map(event.Records.filter(r => r.eventName == "REMOVE" && r.userIdentity && r.userIdentity.principalId == "dynamodb.amazonaws.com"), function(record, recordCallback) {
         // resolve the record data based on the service
         if (serviceName === KINESIS_SERVICE_NAME) {
             // run the record through the KPL deaggregator
@@ -466,14 +466,12 @@ function processEvent(event, serviceName, streamName, callback) {
                 }
             });
         } else {
-            if (record.eventName == "REMOVE" && record.userIdentity && record.userIdentity.principalId == "dynamodb.amazonaws.com") {
-                console.log(record.eventName);
-         
-                // dynamo update stream record
-                var data = exports.createDynamoDataItem(record);
+            console.log(record.eventName);
 
-                recordCallback(null, data);
-            }
+            // dynamo update stream record
+            var data = exports.createDynamoDataItem(record);
+
+            recordCallback(null, data);
         }
     }, function (err, extractedUserRecords) {
         if (err) {
